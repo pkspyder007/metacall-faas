@@ -5,10 +5,11 @@ import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
 import { initializeAPI } from './api';
+import { getConfig } from './config';
 import { InMemoryApplicationRegistry } from './registry/in-memory-registry';
 import { autoDeployApps } from './utils/autoDeploy';
-import { appsDirectory } from './utils/config';
 import { ensureFolderExists } from './utils/filesystem';
+import { InvokeQueue } from './utils/invoke';
 import { printVersionAndExit } from './utils/version';
 
 // Initialize the FaaS
@@ -21,6 +22,8 @@ void (async (): Promise<void> => {
 
 		dotenv.config();
 		colors.enable();
+
+		const appsDirectory = getConfig().appsDirectory;
 
 		await ensureFolderExists(appsDirectory);
 
@@ -36,11 +39,12 @@ void (async (): Promise<void> => {
 		}
 
 		const registry = new InMemoryApplicationRegistry();
+		const invokeQueue = new InvokeQueue();
 
-		await autoDeployApps(appsDirectory, registry);
+		await autoDeployApps(appsDirectory, registry, invokeQueue);
 
-		const app = initializeAPI({ registry });
-		const port = process.env.PORT || 9000;
+		const app = initializeAPI({ registry, invokeQueue });
+		const port = getConfig().port;
 
 		app.listen(port, () => {
 			console.log(`Server is running on the port ${port}`);

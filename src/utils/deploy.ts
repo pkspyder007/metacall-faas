@@ -4,13 +4,14 @@ import { spawn } from 'child_process';
 import path from 'path';
 import type { Resource } from '../app';
 import { WorkerMessageType, WorkerMessageUnknown } from '../worker/protocol';
-import { invokeQueue } from './invoke';
+import { InvokeQueue } from './invoke';
 import { logProcessOutput } from './logger';
 
 export const deployProcess = async (
 	resource: Resource,
 	env: Record<string, string>,
-	registry: ApplicationRegistry
+	registry: ApplicationRegistry,
+	invokeQueue: InvokeQueue
 ): Promise<void> => {
 	// Spawn a new process
 	const desiredPath = path.join(

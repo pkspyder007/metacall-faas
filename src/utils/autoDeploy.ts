@@ -4,6 +4,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Application, Resource } from '../app';
 import { deployProcess } from './deploy';
+import { InvokeQueue } from './invoke';
 
 const isErrnoException = (err: unknown): err is NodeJS.ErrnoException =>
 	err instanceof Error && 'code' in err;
@@ -31,7 +32,8 @@ const readEnvFile = async (
 
 export const autoDeployApps = async (
 	appsDir: string,
-	registry: ApplicationRegistry
+	registry: ApplicationRegistry,
+	invokeQueue: InvokeQueue
 ): Promise<void> => {
 	const directories = (
 		await fs.readdir(appsDir, {
@@ -63,7 +65,7 @@ export const autoDeployApps = async (
 		const env = await readEnvFile(envFilePath);
 
 		try {
-			await deployProcess(resource, env, registry);
+			await deployProcess(resource, env, registry, invokeQueue);
 			succeeded++;
 		} catch (err) {
 			registry.delete(resource.id);

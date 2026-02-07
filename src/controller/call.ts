@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
 import AppError from '../utils/appError';
-import { invokeQueue } from '../utils/invoke';
 import { WorkerMessageType } from '../worker/protocol';
 
 export const callFunction = (
@@ -43,7 +42,7 @@ export const callFunction = (
 	application.proc?.send({
 		type: WorkerMessageType.Invoke,
 		data: {
-			id: invokeQueue.push({
+			id: req.app.locals.invokeQueue.push({
 				resolve: (data: string) => {
 					res.send(data);
 				},

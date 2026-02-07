@@ -54,7 +54,12 @@ export const deploy = catchAsync(
 
 			await installDependencies(resource);
 
-			await deployProcess(resource, env, req.app.locals.registry);
+			await deployProcess(
+				resource,
+				env,
+				req.app.locals.registry,
+				req.app.locals.invokeQueue
+			);
 
 			return res.status(200).json({
 				prefix: hostname(),
