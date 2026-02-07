@@ -8,7 +8,7 @@ export const deploy = catchAsync(
 	async (
 		req: Omit<Request, 'body'> & { body: DeployBody },
 		res: Response,
-		next: NextFunction
+		_next: NextFunction
 	) => {
 		const env = parseEnvFromBody(req.body.env);
 		const result = await createDeployment(

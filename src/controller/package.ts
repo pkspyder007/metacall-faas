@@ -4,7 +4,7 @@ import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from './catch';
 
 export const packageUpload = catchAsync(
-	async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+	async (req: Request, res: Response, _next: NextFunction): Promise<void> => {
 		const result = await uploadAndRegister(
 			req,
 			req.app.locals.registry,

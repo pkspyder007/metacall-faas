@@ -12,7 +12,7 @@ export const repositoryBranchList = catchAsync(
 	async (
 		req: Omit<Request, 'body'> & { body: FetchBranchListBody },
 		res: Response,
-		next: NextFunction
+		_next: NextFunction
 	) => {
 		const { url } = req.body;
 		const result = await listBranches(url);
@@ -24,7 +24,7 @@ export const repositoryFileList = catchAsync(
 	async (
 		req: Omit<Request, 'body'> & { body: FetchFilesFromRepoBody },
 		res: Response,
-		next: NextFunction
+		_next: NextFunction
 	) => {
 		const { url, branch } = req.body;
 		const appsDirectory = getConfig().appsDirectory;
@@ -37,7 +37,7 @@ export const repositoryClone = catchAsync(
 	async (
 		req: Omit<Request, 'body'> & { body: FetchFilesFromRepoBody },
 		res: Response,
-		next: NextFunction
+		_next: NextFunction
 	) => {
 		const { branch, url } = req.body;
 		const result = await cloneAndRegister(

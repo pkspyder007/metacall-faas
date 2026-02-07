@@ -3,6 +3,7 @@ import path from 'path';
 
 import { getConfig } from '@/config';
 import { exists } from '@/helpers/fs';
+import type { AppLocals } from '@/types';
 import AppError from '../utils/appError';
 import { catchAsync } from './catch';
 
@@ -13,7 +14,8 @@ export const serveStatic = catchAsync(
 		}
 
 		const { suffix, file } = req.params;
-		const application = req.app.locals.registry.get(suffix);
+		const { registry } = req.app.locals as AppLocals;
+		const application = registry.get(suffix);
 
 		if (!application?.proc) {
 			return next(
