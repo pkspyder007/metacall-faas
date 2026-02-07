@@ -95,7 +95,8 @@
 		"overrides": [
 			{
 				"files": [
-					"*.js"
+					"*.js",
+					"*.ts"
 				],
 				"rules": {
 					"@typescript-eslint/no-unused-vars": "off",

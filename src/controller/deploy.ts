@@ -3,7 +3,6 @@ import { hostname } from 'os';
 
 import * as fs from 'fs';
 import path from 'path';
-import { Applications } from '../app';
 import AppError from '../utils/appError';
 import { deployProcess } from '../utils/deploy';
 import { installDependencies } from '../utils/install';
@@ -26,7 +25,7 @@ export const deploy = catchAsync(
 		next: NextFunction
 	) => {
 		try {
-			const application = Applications[req.body.suffix];
+			const application = req.app.locals.registry.get(req.body.suffix);
 
 			// Check if the application exists and it is stored
 			if (!application?.resource) {
@@ -55,7 +54,7 @@ export const deploy = catchAsync(
 
 			await installDependencies(resource);
 
-			await deployProcess(resource, env);
+			await deployProcess(resource, env, req.app.locals.registry);
 
 			return res.status(200).json({
 				prefix: hostname(),

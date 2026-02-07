@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from 'express';
 import { rm } from 'fs/promises';
 import { join } from 'path';
 
-import { Applications } from '../app';
 import { appsDirectory } from '../utils/config';
 import { catchAsync } from './catch';
 
@@ -22,7 +21,12 @@ export const deployDelete = catchAsync(
 	): Promise<Response> => {
 		// Extract the suffix (application name) of the application from the request body
 		const { suffix } = req.body;
-		const application = Applications[suffix];
+		const application = req.app.locals.registry.get(suffix);
+		if (!application) {
+			return res.send(
+				`Oops! It looks like the application '${suffix}' doesn't exist. Please create it before you delete it.`
+			);
+		}
 
 		// Check if the application exists and it is running
 		if (!application?.proc) {
@@ -35,7 +39,7 @@ export const deployDelete = catchAsync(
 		application.kill();
 
 		// Remove the application Applications object
-		delete Applications[suffix];
+		req.app.locals.registry.delete(suffix);
 
 		// Determine the location of the application
 		const appLocation = join(appsDirectory, suffix);

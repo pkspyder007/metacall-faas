@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Applications } from '../app';
 
 import AppError from '../utils/appError';
 import { invokeQueue } from '../utils/invoke';
@@ -27,7 +26,8 @@ export const callFunction = (
 
 	const { suffix, func } = req.params;
 	const args = Object.values(req.body);
-	const application = Applications[suffix];
+	const registry = req.app.locals.registry;
+	const application = registry.get(suffix);
 
 	// Check if the application exists and it is running
 	if (!application?.proc) {

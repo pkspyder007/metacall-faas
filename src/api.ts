@@ -17,11 +17,18 @@ import { hostname } from 'os';
 
 import express, { Express, NextFunction, Request, Response } from 'express';
 
+import { InMemoryApplicationRegistry } from './registry/in-memory-registry';
+import { ApplicationRegistry } from './registry/registry';
 import AppError from './utils/appError';
 
-export function initializeAPI(): Express {
+export function initializeAPI(options: {
+	registry: ApplicationRegistry;
+}): Express {
 	const app = express();
 	const host = hostname();
+
+	app.locals.registry =
+		options?.registry ?? new InMemoryApplicationRegistry();
 
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));

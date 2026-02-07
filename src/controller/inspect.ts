@@ -1,11 +1,13 @@
+import type { ApplicationRegistry } from '@/registry/registry';
 import { Deployment } from '@metacall/protocol';
 import { Request, Response } from 'express';
-import { Applications } from '../app';
 
-export const inspect = (_req: Request, res: Response): Response => {
+export const inspect = (req: Request, res: Response): Response => {
 	const deployments: Deployment[] = [];
 
-	for (const application of Object.values(Applications)) {
+	const registry = req.app.locals.registry as ApplicationRegistry;
+
+	for (const application of registry.values()) {
 		// Check if the application is deployed
 		if (application.deployment) {
 			// Ensure packages is not undefined or null

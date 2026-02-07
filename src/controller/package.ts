@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Extract } from 'unzipper';
 
 import { MetaCallJSON } from '@metacall/protocol/deployment';
-import { Application, Applications, Resource } from '../app';
+import { Application, Resource } from '../app';
 import AppError from '../utils/appError';
 import { appsDirectory } from '../utils/config';
 import { ensureFolderExists } from '../utils/filesystem';
@@ -182,26 +182,29 @@ export const packageUpload = (
 			}
 		};
 
-		if (Applications[resource.id]) {
-			deleteBlob();
-			return errorHandler(
-				new AppError(
-					`There is an application with name '${resource.id}' already deployed, delete it first.`,
-					400
-				)
+		const registry = req.app.locals.registry;
+
+		if (registry.get(resource.id)) {
+			throw new AppError(
+				`There is an application with name '${resource.id}' already deployed, delete it first.`,
+				400
 			);
 		}
 
 		let resourceResolve: (value: Resource | PromiseLike<Resource>) => void;
 		let resourceReject: (reason?: unknown) => void;
 
-		Applications[resource.id] = new Application();
-		Applications[resource.id].resource = new Promise<Resource>(
-			(resolve, reject) => {
-				resourceResolve = resolve;
-				resourceReject = reject;
-			}
-		);
+		registry.set(resource.id, new Application());
+
+		const application = registry.get(resource.id);
+		if (!application) {
+			throw new AppError(`Application not found: ${resource.id}`, 404);
+		}
+
+		application.resource = new Promise<Resource>((resolve, reject) => {
+			resourceResolve = resolve;
+			resourceReject = reject;
+		});
 
 		const unzipAndResolve = () => {
 			return new Promise<void>((resolve, reject) => {

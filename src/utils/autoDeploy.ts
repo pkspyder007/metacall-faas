@@ -1,7 +1,8 @@
+import { ApplicationRegistry } from '@/registry/registry';
 import { Dirent } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Application, Applications, Resource } from '../app';
+import { Application, Resource } from '../app';
 import { deployProcess } from './deploy';
 
 const isErrnoException = (err: unknown): err is NodeJS.ErrnoException =>
@@ -28,7 +29,10 @@ const readEnvFile = async (
 	}
 };
 
-export const autoDeployApps = async (appsDir: string): Promise<void> => {
+export const autoDeployApps = async (
+	appsDir: string,
+	registry: ApplicationRegistry
+): Promise<void> => {
 	const directories = (
 		await fs.readdir(appsDir, {
 			withFileTypes: true
@@ -48,17 +52,21 @@ export const autoDeployApps = async (appsDir: string): Promise<void> => {
 
 	let succeeded = 0;
 	for (const resource of resources) {
-		Applications[resource.id] = new Application();
-		Applications[resource.id].resource = Promise.resolve(resource);
+		registry.set(resource.id, new Application());
+		const application = registry.get(resource.id);
+		if (!application) {
+			throw new Error(`Application not found: ${resource.id}`);
+		}
+		application.resource = Promise.resolve(resource);
 
 		const envFilePath = path.join(resource.path, `.env`);
 		const env = await readEnvFile(envFilePath);
 
 		try {
-			await deployProcess(resource, env);
+			await deployProcess(resource, env, registry);
 			succeeded++;
 		} catch (err) {
-			delete Applications[resource.id];
+			registry.delete(resource.id);
 			// eslint-disable-next-line no-console
 			console.warn(
 				`Failed to load app "${resource.id}":`,

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { promises as fs } from 'fs';
 import path, { join } from 'path';
-import { Application, Applications, Resource } from '../app';
+import { Application, Resource } from '../app';
 import AppError from '../utils/appError';
 import { appsDirectory } from '../utils/config';
 import { exec } from '../utils/exec';
@@ -24,7 +24,8 @@ const repositoryName = (url: string): string =>
 		.replace(/\.git$/, '')
 		.split('/')
 		.slice(-2)
-		.join('-');
+		.join('-')
+		.toLowerCase();
 
 const repositoryDelete = async <Path extends string>(
 	path: Path,
@@ -178,10 +179,13 @@ export const repositoryClone = catchAsync(
 		resource.runners = await findRunners(resource.path);
 
 		// Create a new Application instance and assign the resource to it
-		const application = new Application();
+		const registry = req.app.locals.registry;
+		registry.set(id, new Application());
+		const application = registry.get(id);
+		if (!application) {
+			throw new AppError(`Application not found: ${id}`, 404);
+		}
 		application.resource = Promise.resolve(resource);
-
-		Applications[id] = application;
 
 		return res.status(201).send({ id });
 	}

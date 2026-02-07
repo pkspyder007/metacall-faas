@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import path from 'path';
 import { initializeAPI } from './api';
+import { InMemoryApplicationRegistry } from './registry/in-memory-registry';
 import { autoDeployApps } from './utils/autoDeploy';
 import { appsDirectory } from './utils/config';
 import { ensureFolderExists } from './utils/filesystem';
@@ -34,9 +35,11 @@ void (async (): Promise<void> => {
 			}
 		}
 
-		await autoDeployApps(appsDirectory);
+		const registry = new InMemoryApplicationRegistry();
 
-		const app = initializeAPI();
+		await autoDeployApps(appsDirectory, registry);
+
+		const app = initializeAPI({ registry });
 		const port = process.env.PORT || 9000;
 
 		app.listen(port, () => {

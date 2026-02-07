@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 
-import { Applications } from '../app';
 import AppError from '../utils/appError';
 import { appsDirectory } from '../utils/config';
 import { exists } from '../utils/filesystem';
@@ -14,7 +13,7 @@ export const serveStatic = catchAsync(
 		}
 
 		const { suffix, file } = req.params;
-		const application = Applications[suffix];
+		const application = req.app.locals.registry.get(suffix);
 
 		// Check if the application exists and it is running
 		if (!application?.proc) {

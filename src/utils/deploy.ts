@@ -1,14 +1,16 @@
+import { ApplicationRegistry } from '@/registry/registry';
 import { Deployment } from '@metacall/protocol';
 import { spawn } from 'child_process';
 import path from 'path';
-import { Applications, Resource } from '../app';
+import type { Resource } from '../app';
 import { WorkerMessageType, WorkerMessageUnknown } from '../worker/protocol';
 import { invokeQueue } from './invoke';
 import { logProcessOutput } from './logger';
 
 export const deployProcess = async (
 	resource: Resource,
-	env: Record<string, string>
+	env: Record<string, string>,
+	registry: ApplicationRegistry
 ): Promise<void> => {
 	// Spawn a new process
 	const desiredPath = path.join(
@@ -47,7 +49,10 @@ export const deployProcess = async (
 		switch (payload.type) {
 			case WorkerMessageType.MetaData: {
 				// Get the deploy data and store the process and app into our tables
-				const application = Applications[resource.id];
+				const application = registry.get(resource.id);
+				if (!application) {
+					throw new Error(`Application not found: ${resource.id}`);
+				}
 				const deployment = payload.data as Deployment;
 
 				application.proc = proc;
