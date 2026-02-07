@@ -17,7 +17,7 @@
 #	limitations under the License.
 #
 
-FROM node:20-bookworm-slim AS base
+FROM --platform=linux/amd64 node:20-bookworm-slim AS base
 
 # Image descriptor
 LABEL copyright.name="Vicente Eduardo Ferrer Garcia" \

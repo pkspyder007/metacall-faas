@@ -19,5 +19,3 @@ export class Application {
 		this.proc?.kill();
 	}
 }
-
-export const Applications: Record<string, Application> = {};

@@ -7,7 +7,12 @@
 		"outDir": "dist",
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
-		"types": ["node", "mocha"]
+		"types": ["node", "mocha"],
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
 	},
-	"include": ["types/*.ts", "src/**/*.ts", "test/**/*.js"]
+	"include": ["types/*.ts", "src/**/*.ts", "test/**/*.js"],
+	"exclude": ["node_modules", "dist"]
 }

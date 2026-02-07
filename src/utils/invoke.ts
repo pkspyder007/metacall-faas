@@ -1,11 +1,16 @@
 import crypto from 'crypto';
 
-interface Invocation {
+export interface Invocation {
 	resolve: (value: string) => void;
 	reject: (reason: string) => void;
 }
 
-class InvokeQueue {
+export interface InvokeQueueInterface {
+	push(invoke: Invocation): string;
+	get(id: string): Invocation | undefined;
+}
+
+export class InvokeQueue implements InvokeQueueInterface {
 	private queue: Record<string, Invocation> = {};
 
 	public push(invoke: Invocation): string {
@@ -20,5 +25,3 @@ class InvokeQueue {
 		return invoke;
 	}
 }
-
-export const invokeQueue = new InvokeQueue();

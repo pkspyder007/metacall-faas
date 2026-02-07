@@ -13,15 +13,24 @@ import {
 import { serveStatic } from './controller/static';
 import { validate } from './controller/validate';
 
-import { hostname } from 'os';
-
 import express, { Express, NextFunction, Request, Response } from 'express';
 
+import { getConfig } from './config';
+import { InMemoryApplicationRegistry } from './registry/in-memory-registry';
+import { ApplicationRegistry } from './registry/registry';
 import AppError from './utils/appError';
+import { InvokeQueue, InvokeQueueInterface } from './utils/invoke';
 
-export function initializeAPI(): Express {
+export function initializeAPI(options: {
+	registry: ApplicationRegistry;
+	invokeQueue: InvokeQueueInterface;
+}): Express {
 	const app = express();
-	const host = hostname();
+	const host = getConfig().prefix;
+
+	app.locals.registry =
+		options?.registry ?? new InMemoryApplicationRegistry();
+	app.locals.invokeQueue = options?.invokeQueue ?? new InvokeQueue();
 
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
@@ -35,7 +44,7 @@ export function initializeAPI(): Express {
 	app.get(`/${host}/:suffix/:version/call/:func`, callFunction);
 	app.post(`/${host}/:suffix/:version/call/:func`, callFunction);
 	app.get(
-		`/${host}/:suffix/:version/static/.metacall/faas/apps/:suffix/:file`,
+		`/${host}/:suffix/:version/static/.metacall/faas/apps/:file`,
 		serveStatic
 	);
 

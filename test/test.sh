@@ -21,7 +21,7 @@
 set -exuo pipefail
 
 # Maximum number of retries
-MAX_RETRIES=5
+MAX_RETRIES=30
 RETRY_COUNT=0
 
 # FaaS base URL
