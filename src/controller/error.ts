@@ -1,22 +1,26 @@
+import type { IAppError } from '@/types';
 import { NextFunction, Request, Response } from 'express';
-import { IAppError } from '../utils/appError';
 
 export const globalError = (
-	err: IAppError,
-	req: Request,
+	err: IAppError | Error,
+	_req: Request,
 	res: Response,
 	_next: NextFunction
 ): Response => {
-	err.statusCode = err.statusCode || 500;
-	err.status = err.status || 'error';
+	const statusCode =
+		'statusCode' in err && typeof err.statusCode === 'number'
+			? err.statusCode
+			: 500;
+	const message = err instanceof Error ? err.message : String(err);
 
-	if (process.env.NODE_ENV === 'development') {
-		console.log(
-			`Status Code: ${err.statusCode}\nStatus: ${err.status}\n${
-				err.stack || ''
-			}`
-		);
+	if (
+		process.env.NODE_ENV === 'development' &&
+		err instanceof Error &&
+		err.stack
+	) {
+		// eslint-disable-next-line no-console
+		console.log(`Status Code: ${statusCode}\n${err.stack}`);
 	}
 
-	return res.status(err.statusCode).send(err.message);
+	return res.status(statusCode).send(message);
 };

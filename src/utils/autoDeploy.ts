@@ -1,3 +1,4 @@
+import { readEnvFile } from '@/helpers/env';
 import { ApplicationRegistry } from '@/registry/registry';
 import { Dirent } from 'fs';
 import * as fs from 'fs/promises';
@@ -5,30 +6,6 @@ import * as path from 'path';
 import { Application, Resource } from '../app';
 import { deployProcess } from './deploy';
 import { InvokeQueue } from './invoke';
-
-const isErrnoException = (err: unknown): err is NodeJS.ErrnoException =>
-	err instanceof Error && 'code' in err;
-
-const readEnvFile = async (
-	envFilePath: string
-): Promise<Record<string, string>> => {
-	try {
-		const envFileContent = await fs.readFile(envFilePath, 'utf-8');
-
-		return envFileContent.split('\n').reduce((acc, line) => {
-			const [name, value] = line.split('=');
-			if (name?.trim()) {
-				acc[name.trim()] = (value ?? '').trim();
-			}
-			return acc;
-		}, {} as Record<string, string>);
-	} catch (err: unknown) {
-		if (isErrnoException(err) && err.code === 'ENOENT') {
-			return {};
-		}
-		throw err;
-	}
-};
 
 export const autoDeployApps = async (
 	appsDir: string,

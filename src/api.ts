@@ -44,9 +44,7 @@ export function initializeAPI(options: {
 	app.get(`/${host}/:suffix/:version/call/:func`, callFunction);
 	app.post(`/${host}/:suffix/:version/call/:func`, callFunction);
 	app.get(
-		`/${host}/:suffix/:version/static/${
-			getConfig().appsDirectory
-		}/:suffix/:file`,
+		`/${host}/:suffix/:version/static/.metacall/faas/apps/:file`,
 		serveStatic
 	);
 
