@@ -7,6 +7,8 @@
 		"metacall-faas": "dist/index.js"
 	},
 	"scripts": {
+		"docs": "vitepress dev doc",
+		"docs:build": "vitepress build doc",
 		"test": "npm run buildDebug && mocha dist/test",
 		"integration": "./test.sh",
 		"prepublishOnly": "npm run build",
@@ -130,9 +132,12 @@
 		"eslint-config-prettier": "^6.15.0",
 		"eslint-plugin-prettier": "^3.1.4",
 		"eslint-plugin-tsdoc": "^0.2.7",
+		"mermaid": "^11.12.2",
 		"mocha": "^10.2.0",
 		"prettier": "^2.1.2",
 		"tsc-alias": "^1.8.10",
-		"typescript": "^4.3.2"
+		"typescript": "^4.3.2",
+		"vitepress": "^1.6.4",
+		"vitepress-plugin-mermaid": "^2.0.17"
 	}
 }
