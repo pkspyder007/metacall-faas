@@ -8,6 +8,6 @@ export const catchAsync = (
 	) => Promise<Response | void>
 ): RequestHandler => {
 	return (req: Request, res: Response, next: NextFunction) => {
-		return fn(req, res, next).catch(err => next(err));
+		return fn(req, res, next).catch(next);
 	};
 };

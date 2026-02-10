@@ -1,9 +1,14 @@
 import { invoke } from '@/services/call';
+import { AppLocals } from '@/types';
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../utils/appError';
 
 export const callFunction = (
-	req: Request,
+	req: Request<
+		{ suffix: string; func: string },
+		string,
+		Record<string, unknown>
+	>,
 	res: Response,
 	next: NextFunction
 ): Response | void => {
@@ -24,14 +29,14 @@ export const callFunction = (
 
 	const { suffix, func } = req.params;
 	const args = Object.values(req.body);
-
+	const { registry, invokeQueue } = req.app.locals as AppLocals;
 	try {
 		invoke(
 			suffix,
 			func,
 			args,
-			req.app.locals.registry,
-			req.app.locals.invokeQueue,
+			registry,
+			invokeQueue,
 			(data: string) => res.send(data),
 			(error: string) => res.status(500).send(error)
 		);
