@@ -103,6 +103,6 @@ jobs:
             ## 🧪 Coverage Report
 
             📊 **HTML Coverage Report for this PR:**  
-            👉 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/coverage/pr-${{ github.event.number }}/index.html
+            👉 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/coverage/pr-${{ github.event.number }}/lcov-report/index.html
 
             *(Updated on every CI run. Open the link to view the full HTML coverage report.)*
