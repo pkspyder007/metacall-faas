@@ -4,7 +4,11 @@ import {
 	listBranches,
 	listFiles
 } from '@/services/repository';
-import type { FetchBranchListBody, FetchFilesFromRepoBody } from '@/types';
+import type {
+	AppLocals,
+	FetchBranchListBody,
+	FetchFilesFromRepoBody
+} from '@/types';
 import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from './catch';
 
@@ -40,10 +44,11 @@ export const repositoryClone = catchAsync(
 		_next: NextFunction
 	) => {
 		const { branch, url } = req.body;
+		const { registry } = req.app.locals as AppLocals;
 		const result = await cloneAndRegister(
 			url,
 			branch,
-			req.app.locals.registry,
+			registry,
 			getConfig().appsDirectory
 		);
 		return res.status(201).send(result);

@@ -12,11 +12,11 @@ export type { Application, Resource } from '../app';
 
 import type { Request } from 'express';
 import type { ApplicationRegistry } from '../registry/registry';
-import type { InvokeQueueInterface } from '../utils/invoke';
+import type { InvokeQueue } from '../utils/invoke';
 
 export interface AppLocals {
 	registry: ApplicationRegistry;
-	invokeQueue: InvokeQueueInterface;
+	invokeQueue: InvokeQueue;
 }
 
 export interface AppRequest extends Request {
