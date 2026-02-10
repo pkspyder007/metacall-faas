@@ -16,6 +16,12 @@ concurrency:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      pull-requests: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,9 +63,46 @@ jobs:
       - name: Run Integration Tests
         run: npm run integration
 
-      - name: Publish
-        uses: JS-DevTools/npm-publish@v3
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Prepare coverage for GitHub Pages
+        if: github.event_name == 'pull_request'
+        run: |
+          mkdir -p ./public/coverage/pr-${{ github.event.number }}
+          cp -r ./coverage/* ./public/coverage/pr-${{ github.event.number }}/
+
+      - name: Upload artifact for Pages
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-pages-artifact@v3
         with:
-          access: 'public'
-          token: ${{ secrets.NPM_AUTH_TOKEN }}
+          path: ./public
+
+  deploy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: ci
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+  comment:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Comment on PR with coverage link
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: coverage-report
+          message: |
+            ## 🧪 Coverage Report
+
+            📊 **HTML Coverage Report for this PR:**  
+            👉 https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/coverage/pr-${{ github.event.number }}/index.html
+
+            *(Updated on every CI run. Open the link to view the full HTML coverage report.)*
