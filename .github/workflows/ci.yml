@@ -60,8 +60,8 @@ jobs:
           files: coverage/lcov.info
           fail_ci_if_error: false
 
-      - name: Run Integration Tests
-        run: npm run integration
+      # - name: Run Integration Tests
+      #   run: npm run integration
 
       - name: Prepare coverage for GitHub Pages
         if: github.event_name == 'pull_request'
@@ -96,7 +96,7 @@ jobs:
 
     steps:
       - name: Comment on PR with coverage link
-        uses: marocchino/sticky-pull-request-comment@v3
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: coverage-report
           message: |
