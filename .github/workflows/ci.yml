@@ -38,9 +38,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run Unit Tests
-        shell: bash
-        run: npm run test
+      - name: Run tests coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage report (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+          fail_ci_if_error: false
 
       - name: Run Integration Tests
         run: npm run integration

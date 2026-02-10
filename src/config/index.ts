@@ -23,7 +23,7 @@ export function getConfig(): AppConfig {
 	};
 }
 
-export function setConfigForTest(partial: Partial<AppConfig>): void {
+export function setConfigOverrides(partial: Partial<AppConfig>): void {
 	overrides = { ...overrides, ...partial };
 }
 
